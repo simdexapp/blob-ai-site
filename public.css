@@ -277,7 +277,7 @@ a {
 .chat-stage {
   position: relative;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto auto minmax(122px, 0.58fr);
+  grid-template-rows: minmax(0, 1fr) auto auto auto minmax(122px, 0.58fr);
   justify-items: center;
   min-height: 100vh;
   padding: 58px 24px 34px;
@@ -441,6 +441,37 @@ h1 {
 
 .quick-prompts a:hover {
   background: rgba(255, 255, 255, 0.08);
+}
+
+.launch-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.launch-actions a {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 999px;
+  padding: 0 15px;
+  background: rgba(31, 31, 31, 0.68);
+  color: var(--soft);
+  font-size: 14px;
+}
+
+.launch-actions a:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.launch-actions .launch-primary {
+  border-color: rgba(255, 255, 255, 0.72);
+  background: var(--text);
+  color: #070707;
+  font-weight: 720;
 }
 
 .promo-card {
@@ -785,7 +816,7 @@ h1 {
   }
 
   .chat-stage {
-    grid-template-rows: minmax(210px, 0.75fr) auto auto auto;
+    grid-template-rows: minmax(210px, 0.75fr) auto auto auto auto;
     padding: 58px 14px 18px;
   }
 
