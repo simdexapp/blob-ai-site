@@ -3,103 +3,151 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>blob.ai - local agentic AI</title>
-    <meta name="description" content="blob.ai is a local personal AI workbench with model council, tool approvals, memory, and workspace search.">
+    <title>blob.ai</title>
+    <meta name="description" content="blob.ai is a black-theme local AI workbench for model council, memory, workspace search, and safe tool approvals.">
     <link rel="stylesheet" href="./public.css">
   </head>
   <body>
     <canvas id="siteInk" aria-hidden="true"></canvas>
-    <header class="site-nav">
-      <a class="site-brand" href="./" aria-label="blob.ai">
-        <span class="site-mark"></span>
-        <span>blob.ai</span>
-      </a>
-      <nav aria-label="Site">
-        <a href="#engine">Engine</a>
-        <a href="#library">Models</a>
-        <a href="#deploy">Deploy</a>
-        <a class="nav-cta" href="#deploy">Run locally</a>
-      </nav>
-    </header>
+    <div class="page-glow" aria-hidden="true"></div>
 
-    <main>
-      <section class="hero">
-        <div class="hero-copy">
-          <p class="eyebrow">Local agentic AI workbench</p>
-          <h1>blob.ai</h1>
-          <p class="hero-lede">
-            A pitch-black personal assistant that runs local models, lets them hold council, searches your workspace, and asks before touching anything risky.
-          </p>
-          <div class="hero-actions">
-            <a class="primary-action" href="#deploy">Run locally</a>
-            <a class="secondary-action" href="#deploy">Deployment path</a>
-          </div>
-        </div>
-
-        <div class="product-signal" aria-label="Product preview">
-          <div class="signal-top">
+    <div class="chat-shell">
+      <aside class="chat-sidebar" aria-label="Navigation">
+        <div class="sidebar-head">
+          <a class="brand-orb" href="./" aria-label="blob.ai">
             <span></span>
-            <strong>Ollama · qwen2.5</strong>
+          </a>
+          <button class="icon-button" type="button" aria-label="Collapse sidebar">
+            <span class="icon-columns"></span>
+          </button>
+        </div>
+
+        <nav class="primary-nav" aria-label="Primary">
+          <a class="nav-row active" href="#new">
+            <span class="icon-pencil"></span>
+            <span>New chat</span>
+          </a>
+          <a class="nav-row" href="#search">
+            <span class="icon-search"></span>
+            <span>Search chats</span>
+          </a>
+          <a class="nav-row" href="#codex">
+            <span class="icon-code"></span>
+            <span>Agent mode</span>
+          </a>
+          <a class="nav-row" href="#more">
+            <span class="icon-dots"></span>
+            <span>More</span>
+          </a>
+        </nav>
+
+        <section class="sidebar-section">
+          <h2>Projects</h2>
+          <a class="nav-row" href="#project">
+            <span class="icon-folder"></span>
+            <span>New project</span>
+          </a>
+          <a class="nav-row" href="#library">
+            <span class="icon-folder"></span>
+            <span>Model library</span>
+          </a>
+          <a class="nav-row" href="#workspace">
+            <span class="icon-folder"></span>
+            <span>Workspace search</span>
+          </a>
+          <a class="nav-row" href="#council">
+            <span class="icon-folder"></span>
+            <span>Local council</span>
+          </a>
+        </section>
+
+        <section class="sidebar-section recent-list">
+          <h2>Recents</h2>
+          <a class="recent active" href="#local-agent">Local assistant build</a>
+          <a class="recent" href="#model-router">Model router plan</a>
+          <a class="recent" href="#tool-policy">Tool approval rules</a>
+          <a class="recent" href="#public-site">Public website draft</a>
+          <a class="recent" href="#memory">Memory design</a>
+        </section>
+
+        <div class="account-row">
+          <span class="avatar">b</span>
+          <div>
+            <strong>blob.ai</strong>
+            <span>Local-first</span>
           </div>
-          <div class="signal-thread">
-            <p>Workspace context: 4 snippets</p>
-            <p>Council: draft → critique → synthesize</p>
-            <p>Approval queued: run_shell</p>
+        </div>
+      </aside>
+
+      <main class="chat-main">
+        <header class="chat-topbar">
+          <button class="model-button" type="button">
+            <span>blob.ai</span>
+            <span class="chevron"></span>
+          </button>
+          <div class="top-actions">
+            <a class="top-icon" href="https://github.com/simdexapp/blob-ai-site" target="_blank" rel="noreferrer" aria-label="GitHub">
+              <span class="icon-share"></span>
+            </a>
+            <a class="top-icon" href="https://github.com/simdexapp/blob-ai-site" target="_blank" rel="noreferrer" aria-label="Project repository">
+              <span class="icon-ring"></span>
+            </a>
           </div>
-        </div>
-      </section>
+        </header>
 
-      <section id="engine" class="band">
-        <div class="section-heading">
-          <p class="eyebrow">Engine</p>
-          <h2>Built around control, not blind automation.</h2>
-        </div>
-        <div class="feature-grid">
-          <article>
-            <span>01</span>
-            <h3>Local-first models</h3>
-            <p>Uses Ollama or LM Studio as the default brain before falling back to API providers.</p>
-          </article>
-          <article>
-            <span>02</span>
-            <h3>Council mode</h3>
-            <p>Runs draft, critique, and synthesis passes across different local model personalities.</p>
-          </article>
-          <article>
-            <span>03</span>
-            <h3>Approval gates</h3>
-            <p>Shell commands, writes, and installs pause for explicit approval before execution.</p>
-          </article>
-        </div>
-      </section>
+        <section class="chat-stage" aria-label="blob.ai prompt">
+          <div class="headline-stack">
+            <div class="mini-mark" aria-hidden="true"></div>
+            <h1>Where should we begin?</h1>
+          </div>
 
-      <section id="library" class="band split-band">
-        <div class="section-heading">
-          <p class="eyebrow">Model library</p>
-          <h2>Curated pulls, public GitHub source checks, no random scripts.</h2>
-        </div>
-        <div class="library-lines">
-          <p>Ollama pulls for practical local models.</p>
-          <p>GitHub release metadata for runtimes and source projects.</p>
-          <p>Hugging Face and GGUF hooks next.</p>
-        </div>
-      </section>
+          <form class="prompt-card" action="#prompt">
+            <label for="promptInput" class="sr-only">Ask blob.ai</label>
+            <textarea id="promptInput" rows="2" placeholder="Ask anything"></textarea>
+            <div class="prompt-actions">
+              <div class="left-tools">
+                <button class="round-tool" type="button" aria-label="Attach context">
+                  <span>+</span>
+                </button>
+                <button class="mode-pill" type="button">
+                  <span class="thinking-dot"></span>
+                  <span>Thinking</span>
+                  <span class="chevron"></span>
+                </button>
+              </div>
+              <div class="right-tools">
+                <button class="round-tool" type="button" aria-label="Voice input">
+                  <span class="icon-mic"></span>
+                </button>
+                <button class="voice-button" type="button" aria-label="Start voice">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </button>
+              </div>
+            </div>
+          </form>
 
-      <section id="deploy" class="band deploy-band">
-        <div class="section-heading">
-          <p class="eyebrow">Public website</p>
-          <h2>Ready for static hosting.</h2>
-          <p>
-            This page is static and can deploy to GitHub Pages, Cloudflare Pages, Netlify, Vercel, or any simple web host. The private workbench stays local unless you deliberately expose it.
-          </p>
-        </div>
-        <div class="deploy-steps">
-          <div><strong>1</strong><span>Choose host</span></div>
-          <div><strong>2</strong><span>Publish static site</span></div>
-          <div><strong>3</strong><span>Keep agent server private</span></div>
-        </div>
-      </section>
-    </main>
+          <div class="quick-prompts" aria-label="Quick actions">
+            <a href="#image"><span class="icon-image"></span> Create an image</a>
+            <a href="#write"><span class="icon-pen"></span> Write or edit</a>
+            <a href="#look"><span class="icon-globe"></span> Look something up</a>
+          </div>
+
+          <aside class="promo-card" aria-label="blob.ai features">
+            <button class="promo-close" type="button" aria-label="Close">×</button>
+            <h2>Try local model council</h2>
+            <p>Route a prompt through Qwen, Llama, Mistral, or DeepSeek and synthesize one answer.</p>
+            <div class="promo-grid">
+              <div><span>Workspace</span><strong>Search files</strong></div>
+              <div><span>Tools</span><strong>Ask first</strong></div>
+              <div><span>Models</span><strong>Ollama pulls</strong></div>
+              <div><span>Memory</span><strong>SQLite local</strong></div>
+            </div>
+          </aside>
+        </section>
+      </main>
+    </div>
 
     <script src="./public.js"></script>
   </body>
