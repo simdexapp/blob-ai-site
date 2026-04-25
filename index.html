@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>blob.ai - local agentic AI</title>
+    <meta name="description" content="blob.ai is a local personal AI workbench with model council, tool approvals, memory, and workspace search.">
+    <link rel="stylesheet" href="./public.css">
+  </head>
+  <body>
+    <canvas id="siteInk" aria-hidden="true"></canvas>
+    <header class="site-nav">
+      <a class="site-brand" href="./" aria-label="blob.ai">
+        <span class="site-mark"></span>
+        <span>blob.ai</span>
+      </a>
+      <nav aria-label="Site">
+        <a href="#engine">Engine</a>
+        <a href="#library">Models</a>
+        <a href="#deploy">Deploy</a>
+        <a class="nav-cta" href="#deploy">Run locally</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Local agentic AI workbench</p>
+          <h1>blob.ai</h1>
+          <p class="hero-lede">
+            A pitch-black personal assistant that runs local models, lets them hold council, searches your workspace, and asks before touching anything risky.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#deploy">Run locally</a>
+            <a class="secondary-action" href="#deploy">Deployment path</a>
+          </div>
+        </div>
+
+        <div class="product-signal" aria-label="Product preview">
+          <div class="signal-top">
+            <span></span>
+            <strong>Ollama · qwen2.5</strong>
+          </div>
+          <div class="signal-thread">
+            <p>Workspace context: 4 snippets</p>
+            <p>Council: draft → critique → synthesize</p>
+            <p>Approval queued: run_shell</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="engine" class="band">
+        <div class="section-heading">
+          <p class="eyebrow">Engine</p>
+          <h2>Built around control, not blind automation.</h2>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <span>01</span>
+            <h3>Local-first models</h3>
+            <p>Uses Ollama or LM Studio as the default brain before falling back to API providers.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Council mode</h3>
+            <p>Runs draft, critique, and synthesis passes across different local model personalities.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Approval gates</h3>
+            <p>Shell commands, writes, and installs pause for explicit approval before execution.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="library" class="band split-band">
+        <div class="section-heading">
+          <p class="eyebrow">Model library</p>
+          <h2>Curated pulls, public GitHub source checks, no random scripts.</h2>
+        </div>
+        <div class="library-lines">
+          <p>Ollama pulls for practical local models.</p>
+          <p>GitHub release metadata for runtimes and source projects.</p>
+          <p>Hugging Face and GGUF hooks next.</p>
+        </div>
+      </section>
+
+      <section id="deploy" class="band deploy-band">
+        <div class="section-heading">
+          <p class="eyebrow">Public website</p>
+          <h2>Ready for static hosting.</h2>
+          <p>
+            This page is static and can deploy to GitHub Pages, Cloudflare Pages, Netlify, Vercel, or any simple web host. The private workbench stays local unless you deliberately expose it.
+          </p>
+        </div>
+        <div class="deploy-steps">
+          <div><strong>1</strong><span>Choose host</span></div>
+          <div><strong>2</strong><span>Publish static site</span></div>
+          <div><strong>3</strong><span>Keep agent server private</span></div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./public.js"></script>
+  </body>
+</html>
