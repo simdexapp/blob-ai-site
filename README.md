@@ -1,23 +1,30 @@
-# blob.ai public site
+# versaAI
 
-This folder is the static public website for blob.ai.
+The unfiltered AI companion. Multi-persona chat with voice, memory, and zero filter.
 
-Publish only these files when making a public website:
+This repository holds the static landing page for versaAI:
 
-- `index.html`
-- `public.css`
-- `public.js`
+- `index.html` — landing page (hero, demo, personas, features, waitlist, FAQ)
+- `public.css` — styles (dark/neon theme)
+- `public.js` — age gate, animated mascot, demo chat, waitlist form
 
-Do not publish the local agent server, `.env`, `.agent`, memory database, or workspace files unless you intentionally want the whole project source public.
+## 18+ only
 
-## GitHub Pages
+versaAI is intended for adults. The landing page includes a first-visit age gate (stored in `localStorage` under `versaai.age.confirmed`). All personas are fictional and depicted as 18 or older. We do not allow content involving minors, real-person impersonation, harassment, or illegal activity.
 
-Fast path:
+## Local preview
 
-1. Create a public GitHub repository for the website, such as `blob-ai-site`.
-2. Upload the contents of this folder to the repository root.
-3. In GitHub, open Settings -> Pages.
-4. Set Source to `Deploy from a branch`.
-5. Pick branch `main` and folder `/root`.
+Any static file server works:
 
-The site can also deploy to Cloudflare Pages, Netlify, or Vercel as a static site with this folder as the publish directory.
+```bash
+python3 -m http.server 8000
+# then open http://localhost:8000
+```
+
+## Deploy
+
+Static site — drop the three files at the root and deploy to GitHub Pages, Cloudflare Pages, Netlify, or Vercel. No build step.
+
+## What's next
+
+The current site is marketing-only. The chat backend (model routing, persona system prompts, voice, memory) is the next milestone — see issues / project board.

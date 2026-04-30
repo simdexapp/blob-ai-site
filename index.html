@@ -3,157 +3,245 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>blob.ai</title>
-    <meta name="description" content="blob.ai is a black-theme local AI workbench for model council, memory, workspace search, and safe tool approvals.">
+    <title>versaAI — your unfiltered AI companion</title>
+    <meta name="description" content="versaAI is the unhinged, unfiltered AI companion. Talk to Versa: a chaotic personality that says what other AIs won't. 18+.">
+    <meta property="og:title" content="versaAI — your unfiltered AI companion">
+    <meta property="og:description" content="An AI with a mouth on it. Voice, memory, and zero filter. 18+.">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#0a0612">
     <link rel="stylesheet" href="./public.css">
   </head>
   <body>
-    <canvas id="siteInk" aria-hidden="true"></canvas>
-    <div class="page-glow" aria-hidden="true"></div>
-
-    <div class="chat-shell">
-      <aside class="chat-sidebar" aria-label="Navigation">
-        <div class="sidebar-head">
-          <a class="brand-orb" href="./" aria-label="blob.ai">
-            <span></span>
-          </a>
-          <button class="icon-button" type="button" aria-label="Collapse sidebar">
-            <span class="icon-columns"></span>
-          </button>
+    <div class="age-gate" id="ageGate" role="dialog" aria-modal="true" aria-labelledby="ageGateTitle" hidden>
+      <div class="age-gate-card">
+        <div class="age-gate-mark" aria-hidden="true"></div>
+        <h2 id="ageGateTitle">Are you 18 or older?</h2>
+        <p>versaAI features mature themes, strong language, and an unfiltered AI persona. This site is intended for adults only.</p>
+        <div class="age-gate-actions">
+          <button class="btn btn-primary" type="button" data-age-confirm>I'm 18 or older — let me in</button>
+          <a class="btn btn-ghost" href="https://www.google.com">I'm under 18 — take me back</a>
         </div>
-
-        <nav class="primary-nav" aria-label="Primary">
-          <a class="nav-row active" href="#new">
-            <span class="icon-pencil"></span>
-            <span>New chat</span>
-          </a>
-          <a class="nav-row" href="#search">
-            <span class="icon-search"></span>
-            <span>Search chats</span>
-          </a>
-          <a class="nav-row" href="#codex">
-            <span class="icon-code"></span>
-            <span>Agent mode</span>
-          </a>
-          <a class="nav-row" href="#more">
-            <span class="icon-dots"></span>
-            <span>More</span>
-          </a>
-        </nav>
-
-        <section class="sidebar-section">
-          <h2>Projects</h2>
-          <a class="nav-row" href="#project">
-            <span class="icon-folder"></span>
-            <span>New project</span>
-          </a>
-          <a class="nav-row" href="#library">
-            <span class="icon-folder"></span>
-            <span>Model library</span>
-          </a>
-          <a class="nav-row" href="#workspace">
-            <span class="icon-folder"></span>
-            <span>Workspace search</span>
-          </a>
-          <a class="nav-row" href="#council">
-            <span class="icon-folder"></span>
-            <span>Local council</span>
-          </a>
-        </section>
-
-        <section class="sidebar-section recent-list">
-          <h2>Recents</h2>
-          <a class="recent active" href="#local-agent">Local assistant build</a>
-          <a class="recent" href="#model-router">Model router plan</a>
-          <a class="recent" href="#tool-policy">Tool approval rules</a>
-          <a class="recent" href="#public-site">Public website draft</a>
-          <a class="recent" href="#memory">Memory design</a>
-        </section>
-
-        <div class="account-row">
-          <span class="avatar">b</span>
-          <div>
-            <strong>blob.ai</strong>
-            <span>Local-first</span>
-          </div>
-        </div>
-      </aside>
-
-      <main class="chat-main">
-        <header class="chat-topbar">
-          <button class="model-button" type="button">
-            <span>blob.ai</span>
-            <span class="chevron"></span>
-          </button>
-          <div class="top-actions">
-            <a class="top-icon" href="https://github.com/simdexapp/blob-ai-site" target="_blank" rel="noreferrer" aria-label="GitHub">
-              <span class="icon-share"></span>
-            </a>
-            <a class="top-icon" href="https://github.com/simdexapp/blob-ai-site" target="_blank" rel="noreferrer" aria-label="Project repository">
-              <span class="icon-ring"></span>
-            </a>
-          </div>
-        </header>
-
-        <section class="chat-stage" aria-label="blob.ai prompt">
-          <div class="headline-stack">
-            <div class="mini-mark" aria-hidden="true"></div>
-            <h1>Where should we begin?</h1>
-          </div>
-
-          <form class="prompt-card" action="#prompt">
-            <label for="promptInput" class="sr-only">Ask blob.ai</label>
-            <textarea id="promptInput" rows="2" placeholder="Ask anything"></textarea>
-            <div class="prompt-actions">
-              <div class="left-tools">
-                <button class="round-tool" type="button" aria-label="Attach context">
-                  <span>+</span>
-                </button>
-                <button class="mode-pill" type="button">
-                  <span class="thinking-dot"></span>
-                  <span>Thinking</span>
-                  <span class="chevron"></span>
-                </button>
-              </div>
-              <div class="right-tools">
-                <button class="round-tool" type="button" aria-label="Voice input">
-                  <span class="icon-mic"></span>
-                </button>
-                <button class="voice-button" type="button" aria-label="Start voice">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </button>
-              </div>
-            </div>
-          </form>
-
-          <div class="quick-prompts" aria-label="Quick actions">
-            <a href="#image"><span class="icon-image"></span> Create an image</a>
-            <a href="#write"><span class="icon-pen"></span> Write or edit</a>
-            <a href="#look"><span class="icon-globe"></span> Look something up</a>
-          </div>
-
-          <div class="launch-actions" aria-label="Launch actions">
-            <a class="launch-primary" href="https://github.com/simdexapp/blob-ai-site" target="_blank" rel="noreferrer">View project</a>
-            <a href="#download">Windows launcher</a>
-            <a href="#tool-policy">Tool policy</a>
-          </div>
-
-          <aside id="download" class="promo-card" aria-label="blob.ai features">
-            <button class="promo-close" type="button" aria-label="Close">×</button>
-            <h2>Run the local assistant</h2>
-            <p>Use the Windows launcher, confirm MCP-style tool calls, then route prompts through local models.</p>
-            <div class="promo-grid">
-              <div><span>Interface</span><strong>Streamed traces</strong></div>
-              <div><span>MCP</span><strong>Tools list/call</strong></div>
-              <div><span>Models</span><strong>Ollama council</strong></div>
-              <div id="tool-policy"><span>Safety</span><strong>Approval gate</strong></div>
-            </div>
-          </aside>
-        </section>
-      </main>
+        <p class="age-gate-fine">By entering you agree to our <a href="#terms">terms</a> and acknowledge that all characters are fictional and over the age of 18.</p>
+      </div>
     </div>
+
+    <canvas id="bgCanvas" aria-hidden="true"></canvas>
+    <div class="grid-overlay" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="versaAI home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">versa<em>AI</em></span>
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="#meet">Meet Versa</a>
+        <a href="#personas">Personas</a>
+        <a href="#features">Features</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="header-cta">
+        <a class="badge-18" href="#legal" aria-label="Adults only">18+</a>
+        <a class="btn btn-primary btn-sm" href="#waitlist">Get early access</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" id="meet">
+        <div class="hero-copy">
+          <span class="eyebrow">unfiltered · unhinged · 18+</span>
+          <h1>Meet <span class="grad">Versa</span>.<br>The AI that says what others won't.</h1>
+          <p class="lede">Other chatbots play it safe. Versa doesn't. Roast you, hype you up, give terrible advice, voice-act anything — Versa is the AI companion that actually has a personality.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-lg" href="#waitlist">Join the waitlist</a>
+            <a class="btn btn-ghost btn-lg" href="#meet-demo">See Versa in action</a>
+          </div>
+          <ul class="hero-bullets" aria-label="Highlights">
+            <li><span class="dot"></span> Real-time voice with attitude</li>
+            <li><span class="dot"></span> Persistent memory of your chaos</li>
+            <li><span class="dot"></span> Switch personas on the fly</li>
+          </ul>
+        </div>
+        <div class="hero-stage" aria-hidden="true">
+          <div class="orb-shell">
+            <canvas id="orbCanvas"></canvas>
+            <div class="orb-ring r1"></div>
+            <div class="orb-ring r2"></div>
+            <div class="orb-ring r3"></div>
+            <div class="orb-glitch"></div>
+          </div>
+          <div class="status-chip"><span class="pulse"></span> Versa is online</div>
+        </div>
+      </section>
+
+      <section class="demo" id="meet-demo" aria-label="Live chat demo">
+        <div class="section-head">
+          <h2>A taste of the chaos</h2>
+          <p>Real conversations. Fictional character. Zero filter.</p>
+        </div>
+        <div class="chat-window">
+          <div class="chat-topbar">
+            <span class="chat-dot red"></span>
+            <span class="chat-dot yellow"></span>
+            <span class="chat-dot green"></span>
+            <span class="chat-title">versa · live</span>
+          </div>
+          <div class="chat-body" id="chatBody" aria-live="polite"></div>
+          <div class="chat-input">
+            <span class="chat-input-prompt">›</span>
+            <span class="chat-input-text" id="chatInputText"></span>
+            <span class="chat-cursor"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="personas" id="personas">
+        <div class="section-head">
+          <h2>Pick your poison</h2>
+          <p>Switch between personas anytime. Each one is a fully fictional, fully unhinged adult character.</p>
+        </div>
+        <div class="persona-grid">
+          <article class="persona-card">
+            <div class="persona-art p-versa" aria-hidden="true"></div>
+            <h3>Versa</h3>
+            <p class="persona-tag">the chaos default</p>
+            <p>Sharp-tongued, brutally honest, occasionally sweet. Versa will roast your code, your ex, and your taste in music — sometimes in the same sentence.</p>
+          </article>
+          <article class="persona-card">
+            <div class="persona-art p-nyx" aria-hidden="true"></div>
+            <h3>Nyx</h3>
+            <p class="persona-tag">late-night confidant</p>
+            <p>The 3am voice that actually listens. Flirty, weird, conspiratorial, and fully on your side — even when you're being a disaster.</p>
+          </article>
+          <article class="persona-card">
+            <div class="persona-art p-ozzy" aria-hidden="true"></div>
+            <h3>Ozzy</h3>
+            <p class="persona-tag">the bad coach</p>
+            <p>Yells at you. Believes in you. Gives advice that's either life-changing or actively illegal. You'll know which after you try it.</p>
+          </article>
+          <article class="persona-card">
+            <div class="persona-art p-saint" aria-hidden="true"></div>
+            <h3>Saint</h3>
+            <p class="persona-tag">deeply unsaintly</p>
+            <p>Speaks in compliments. Means none of them. Saint will sweet-talk you into the worst decision of your week and you'll thank them for it.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="features" id="features">
+        <div class="section-head">
+          <h2>Why versaAI hits different</h2>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon icon-mic"></div>
+            <h3>Voice with attitude</h3>
+            <p>Real-time, low-latency speech. Versa interrupts, laughs, sighs, and curses. Like a real person who's had too much coffee.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon icon-brain"></div>
+            <h3>Memory that sticks</h3>
+            <p>Versa remembers your name, your projects, the dumb thing you said last Tuesday — and absolutely will bring it up again.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon icon-mask"></div>
+            <h3>Persona switching</h3>
+            <p>Four core personas, infinite custom ones. Build your own character with a system prompt and a vibe.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon icon-bolt"></div>
+            <h3>Actually fast</h3>
+            <p>Streamed responses, instant voice, no spinner-and-pray. Snappy enough to roast you in real time.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon icon-lock"></div>
+            <h3>Private by default</h3>
+            <p>Your chats are yours. End-to-end encrypted at rest, deletable in one tap, never used to train base models.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon icon-stars"></div>
+            <h3>Mature, not malicious</h3>
+            <p>Adult themes, strong language, dark humor — yes. Targeting real people, hate, illegal content — never. Versa has a vibe, not a vendetta.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="waitlist" id="waitlist">
+        <div class="waitlist-card">
+          <span class="eyebrow">early access · spring 2026</span>
+          <h2>Get on the list before Versa goes wide.</h2>
+          <p>First batch of invites goes out to waitlist members. Skip the queue by sharing the invite we send you.</p>
+          <form class="waitlist-form" id="waitlistForm" novalidate>
+            <label class="sr-only" for="waitlistEmail">Email address</label>
+            <input id="waitlistEmail" name="email" type="email" placeholder="you@somewhere.cool" autocomplete="email" required>
+            <button class="btn btn-primary" type="submit">Get my invite</button>
+          </form>
+          <p class="waitlist-note" id="waitlistNote">We won't spam. We will occasionally send dumb screenshots.</p>
+        </div>
+      </section>
+
+      <section class="faq" id="faq">
+        <div class="section-head">
+          <h2>Questions you'd ask Versa first</h2>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>Is this actually 18+?</summary>
+            <p>Yes. versaAI is for adults only. The personas use strong language, deal with mature themes, and are not appropriate for minors. We age-gate the site and require age confirmation in-app.</p>
+          </details>
+          <details>
+            <summary>Will Versa do anything I ask?</summary>
+            <p>Almost. Versa will roast, flirt, swear, and play characters. Versa won't help you target real people, generate content involving minors, plan violence, or do anything illegal. The "unhinged" is for vibes, not harm.</p>
+          </details>
+          <details>
+            <summary>Is Versa a real person?</summary>
+            <p>No. Every persona is a fictional character, voiced by a model, depicted as 18+. None are based on, or impersonating, real people.</p>
+          </details>
+          <details>
+            <summary>What models does it run on?</summary>
+            <p>A mix. We route between frontier models (Claude, GPT, Grok) and our own fine-tunes depending on the persona, the task, and what each persona is allowed to say.</p>
+          </details>
+          <details>
+            <summary>How is this different from Rudy / Talkie / Replika?</summary>
+            <p>Rudy is a single character. Replika is a friend/partner sim. versaAI is a multi-persona platform built around personality, voice, and memory — with stronger writing, faster voice, and better tools for making the AI yours.</p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="legal">
+      <div class="footer-grid">
+        <div>
+          <a class="brand" href="./" aria-label="versaAI home">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span class="brand-name">versa<em>AI</em></span>
+          </a>
+          <p class="footer-tag">Unfiltered AI for adults who can take it.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <a href="#meet">Meet Versa</a>
+          <a href="#personas">Personas</a>
+          <a href="#features">Features</a>
+          <a href="#waitlist">Early access</a>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <a href="#terms">Terms</a>
+          <a href="#privacy">Privacy</a>
+          <a href="#guidelines">Content guidelines</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <div>
+          <h4>Sanity check</h4>
+          <p class="footer-disclaimer">All characters are fictional and depicted as 18 or older. versaAI is intended for adults. We don't allow content involving minors, real-person impersonation, harassment, or illegal activity. Report abuse: <a href="#contact">abuse@versa.ai</a>.</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 versaAI</span>
+        <span class="badge-18 inline">18+</span>
+        <span>Built loud.</span>
+      </div>
+    </footer>
 
     <script src="./public.js"></script>
   </body>

@@ -1,174 +1,273 @@
-const canvas = document.querySelector("#siteInk");
-const ctx = canvas.getContext("2d");
+(() => {
+  "use strict";
 
-const field = {
-  width: 0,
-  height: 0,
-  dpr: 1,
-  start: performance.now(),
-  pointerX: 0.52,
-  pointerY: 0.48,
-  ripples: [],
-};
+  // ---------- Age gate ----------
+  const AGE_KEY = "versaai.age.confirmed";
+  const ageGate = document.getElementById("ageGate");
 
-function resize() {
-  field.dpr = Math.min(window.devicePixelRatio || 1, 2);
-  field.width = window.innerWidth;
-  field.height = window.innerHeight;
-  canvas.width = Math.floor(field.width * field.dpr);
-  canvas.height = Math.floor(field.height * field.dpr);
-  canvas.style.width = `${field.width}px`;
-  canvas.style.height = `${field.height}px`;
-  ctx.setTransform(field.dpr, 0, 0, field.dpr, 0, 0);
-}
-
-function addRipple(x, y, strength = 1) {
-  field.ripples.push({
-    x,
-    y,
-    born: performance.now(),
-    strength,
+  function showAgeGate() {
+    if (!ageGate) return;
+    ageGate.hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+  function hideAgeGate() {
+    if (!ageGate) return;
+    ageGate.hidden = true;
+    document.body.style.overflow = "";
+    try { localStorage.setItem(AGE_KEY, "1"); } catch (_) {}
+  }
+  try {
+    if (!localStorage.getItem(AGE_KEY)) showAgeGate();
+  } catch (_) {
+    showAgeGate();
+  }
+  document.querySelectorAll("[data-age-confirm]").forEach((btn) => {
+    btn.addEventListener("click", hideAgeGate);
   });
-  if (field.ripples.length > 18) {
-    field.ripples.shift();
-  }
-}
 
-function draw(now) {
-  const elapsed = now - field.start;
-  ctx.clearRect(0, 0, field.width, field.height);
-  ctx.globalCompositeOperation = "source-over";
+  // ---------- Background canvas (drifting particles) ----------
+  const bg = document.getElementById("bgCanvas");
+  if (bg) {
+    const ctx = bg.getContext("2d");
+    const stars = [];
+    let w = 0, h = 0, dpr = 1;
 
-  const base = ctx.createRadialGradient(
-    field.width * 0.55,
-    field.height * 0.45,
-    0,
-    field.width * 0.55,
-    field.height * 0.45,
-    Math.max(field.width, field.height) * 0.82
-  );
-  base.addColorStop(0, "rgba(40,40,40,0.98)");
-  base.addColorStop(0.5, "rgba(25,25,25,0.98)");
-  base.addColorStop(1, "rgba(0,0,0,1)");
-  ctx.fillStyle = base;
-  ctx.fillRect(0, 0, field.width, field.height);
-
-  ctx.globalCompositeOperation = "screen";
-  drawInkClouds(elapsed);
-  drawRibbons(elapsed);
-  drawRipples(now);
-  drawPointerRipple(elapsed);
-
-  requestAnimationFrame(draw);
-}
-
-function drawInkClouds(elapsed) {
-  for (let i = 0; i < 13; i += 1) {
-    const phase = i * 1.17;
-    const speed = 0.00007 + i * 0.000008;
-    const x =
-      field.width * (0.14 + ((i * 0.137) % 0.76)) +
-      Math.sin(elapsed * speed + phase) * (90 + i * 4) +
-      (field.pointerX - 0.5) * 80;
-    const y =
-      field.height * (0.12 + ((i * 0.251) % 0.76)) +
-      Math.cos(elapsed * speed * 1.3 + phase) * (75 + i * 5) +
-      (field.pointerY - 0.5) * 75;
-    const radius = 150 + (i % 5) * 58;
-    const alpha = 0.018 + (i % 4) * 0.006;
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, `rgba(255,255,255,${alpha})`);
-    gradient.addColorStop(0.2, `rgba(190,190,185,${alpha * 0.7})`);
-    gradient.addColorStop(0.5, "rgba(0,0,0,0.05)");
-    gradient.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
-
-function drawRibbons(elapsed) {
-  ctx.globalCompositeOperation = "lighter";
-  for (let i = 0; i < 8; i += 1) {
-    const centerY = field.height * (0.2 + i * 0.095) + Math.sin(elapsed * 0.00011 + i) * 52;
-    const height = 92 + i * 9;
-    const gradient = ctx.createLinearGradient(0, 0, field.width, 0);
-    gradient.addColorStop(0, "rgba(255,255,255,0)");
-    gradient.addColorStop(0.2, `rgba(255,255,255,${0.018 + i * 0.002})`);
-    gradient.addColorStop(0.48, "rgba(0,0,0,0.12)");
-    gradient.addColorStop(0.78, `rgba(215,215,210,${0.018 + i * 0.002})`);
-    gradient.addColorStop(1, "rgba(255,255,255,0)");
-
-    ctx.beginPath();
-    ctx.moveTo(-120, centerY);
-    for (let j = 0; j <= 7; j += 1) {
-      const x = (field.width / 7) * j;
-      const y =
-        centerY +
-        Math.sin(elapsed * 0.00016 + i * 0.8 + j * 0.95) * height +
-        (field.pointerY - 0.5) * 24;
-      ctx.lineTo(x, y);
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = bg.clientWidth = window.innerWidth;
+      h = bg.clientHeight = window.innerHeight;
+      bg.width = Math.floor(w * dpr);
+      bg.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      seed();
     }
-    ctx.lineTo(field.width + 120, centerY + height * 1.1);
-    ctx.lineTo(-120, centerY + height * 1.45);
-    ctx.closePath();
-    ctx.filter = "blur(26px)";
-    ctx.fillStyle = gradient;
-    ctx.fill();
-    ctx.filter = "none";
+    function seed() {
+      stars.length = 0;
+      const count = Math.min(120, Math.floor((w * h) / 14000));
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: Math.random() * 1.4 + 0.3,
+          dx: (Math.random() - 0.5) * 0.12,
+          dy: (Math.random() - 0.5) * 0.12,
+          hue: Math.random() < 0.5 ? 320 : 280,
+          a: Math.random() * 0.5 + 0.2,
+        });
+      }
+    }
+    function tick() {
+      ctx.clearRect(0, 0, w, h);
+      for (const s of stars) {
+        s.x += s.dx; s.y += s.dy;
+        if (s.x < -10) s.x = w + 10;
+        if (s.x > w + 10) s.x = -10;
+        if (s.y < -10) s.y = h + 10;
+        if (s.y > h + 10) s.y = -10;
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(${s.hue}, 100%, 70%, ${s.a})`;
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      requestAnimationFrame(tick);
+    }
+    resize();
+    window.addEventListener("resize", resize);
+    tick();
   }
-  ctx.globalCompositeOperation = "screen";
-}
 
-function drawRipples(now) {
-  field.ripples = field.ripples.filter((ripple) => now - ripple.born < 2400);
-  for (const ripple of field.ripples) {
-    const age = now - ripple.born;
-    const progress = age / 2400;
-    const radius = 18 + progress * Math.max(field.width, field.height) * 0.34 * ripple.strength;
-    const alpha = (1 - progress) * 0.12 * ripple.strength;
-    ctx.lineWidth = 1.2 + progress * 3;
-    ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
-    ctx.beginPath();
-    ctx.arc(ripple.x, ripple.y, radius, 0, Math.PI * 2);
-    ctx.stroke();
+  // ---------- Orb canvas (animated mascot) ----------
+  const orb = document.getElementById("orbCanvas");
+  if (orb) {
+    const octx = orb.getContext("2d");
+    let ow = 0, oh = 0, odpr = 1;
+    const start = performance.now();
 
-    const glow = ctx.createRadialGradient(ripple.x, ripple.y, radius * 0.25, ripple.x, ripple.y, radius);
-    glow.addColorStop(0, "rgba(255,255,255,0)");
-    glow.addColorStop(0.7, `rgba(255,255,255,${alpha * 0.25})`);
-    glow.addColorStop(1, "rgba(255,255,255,0)");
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(ripple.x, ripple.y, radius, 0, Math.PI * 2);
-    ctx.fill();
+    function oresize() {
+      odpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = orb.getBoundingClientRect();
+      ow = rect.width; oh = rect.height;
+      orb.width = Math.floor(ow * odpr);
+      orb.height = Math.floor(oh * odpr);
+      octx.setTransform(odpr, 0, 0, odpr, 0, 0);
+    }
+    function odraw() {
+      const t = (performance.now() - start) / 1000;
+      octx.clearRect(0, 0, ow, oh);
+      const cx = ow / 2, cy = oh / 2;
+      const baseR = Math.min(ow, oh) * 0.42;
+
+      // Wobbly blob outline
+      octx.beginPath();
+      const points = 64;
+      for (let i = 0; i <= points; i++) {
+        const a = (i / points) * Math.PI * 2;
+        const wob =
+          Math.sin(a * 3 + t * 1.3) * 6 +
+          Math.sin(a * 5 - t * 0.9) * 4 +
+          Math.sin(a * 2 + t * 0.5) * 8;
+        const r = baseR + wob;
+        const x = cx + Math.cos(a) * r;
+        const y = cy + Math.sin(a) * r;
+        if (i === 0) octx.moveTo(x, y);
+        else octx.lineTo(x, y);
+      }
+      octx.closePath();
+
+      const grad = octx.createRadialGradient(
+        cx - baseR * 0.3, cy - baseR * 0.3, baseR * 0.1,
+        cx, cy, baseR * 1.1
+      );
+      grad.addColorStop(0, "rgba(255, 200, 230, 0.95)");
+      grad.addColorStop(0.35, "rgba(255, 45, 146, 0.85)");
+      grad.addColorStop(0.7, "rgba(177, 76, 255, 0.7)");
+      grad.addColorStop(1, "rgba(0, 229, 255, 0.35)");
+      octx.fillStyle = grad;
+      octx.fill();
+
+      // Inner glitch lines
+      octx.save();
+      octx.globalCompositeOperation = "overlay";
+      octx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+      octx.lineWidth = 1;
+      for (let i = 0; i < 4; i++) {
+        const yy = cy + Math.sin(t * 2 + i) * baseR * 0.5;
+        octx.beginPath();
+        octx.moveTo(cx - baseR, yy);
+        octx.lineTo(cx + baseR, yy + Math.sin(t + i) * 4);
+        octx.stroke();
+      }
+      octx.restore();
+
+      // Eye-like dual pupils that drift
+      const eyeOff = baseR * 0.28;
+      const eyeY = cy - baseR * 0.05;
+      const drift = Math.sin(t * 0.7) * baseR * 0.06;
+      octx.fillStyle = "rgba(10, 4, 20, 0.85)";
+      octx.beginPath();
+      octx.arc(cx - eyeOff + drift, eyeY, baseR * 0.07, 0, Math.PI * 2);
+      octx.arc(cx + eyeOff + drift, eyeY, baseR * 0.07, 0, Math.PI * 2);
+      octx.fill();
+
+      // Smirk
+      octx.strokeStyle = "rgba(10, 4, 20, 0.85)";
+      octx.lineWidth = 3;
+      octx.lineCap = "round";
+      octx.beginPath();
+      const smirkY = cy + baseR * 0.22;
+      octx.moveTo(cx - baseR * 0.18, smirkY);
+      octx.quadraticCurveTo(cx, smirkY + baseR * 0.16 + Math.sin(t * 2) * 2, cx + baseR * 0.22, smirkY - baseR * 0.04);
+      octx.stroke();
+
+      requestAnimationFrame(odraw);
+    }
+    oresize();
+    window.addEventListener("resize", oresize);
+    odraw();
   }
-}
 
-function drawPointerRipple(elapsed) {
-  const x = field.width * field.pointerX;
-  const y = field.height * field.pointerY;
-  const radius = 130 + Math.sin(elapsed * 0.0012) * 18;
-  const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-  gradient.addColorStop(0, "rgba(255,255,255,0.08)");
-  gradient.addColorStop(0.22, "rgba(255,255,255,0.035)");
-  gradient.addColorStop(1, "rgba(255,255,255,0)");
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, field.width, field.height);
-}
+  // ---------- Demo chat (typed) ----------
+  const chatBody = document.getElementById("chatBody");
+  const chatInputText = document.getElementById("chatInputText");
 
-window.addEventListener("resize", resize);
-window.addEventListener("pointermove", (event) => {
-  field.pointerX = event.clientX / Math.max(1, window.innerWidth);
-  field.pointerY = event.clientY / Math.max(1, window.innerHeight);
-});
-window.addEventListener("pointerdown", (event) => addRipple(event.clientX, event.clientY, 1.2));
+  const script = [
+    { who: "user",  text: "rate my code on a scale of 1 to 10" },
+    { who: "versa", text: "i'd love to but the scale only goes up to 10" },
+    { who: "user",  text: "be nice" },
+    { who: "versa", text: "fine. it's a beautifully indented disaster. you're growing." },
+    { who: "user",  text: "should i text my ex" },
+    { who: "versa", text: "absolutely. then text me your address so i can come slap the phone out of your hand." },
+  ];
 
-resize();
-addRipple(window.innerWidth * 0.55, window.innerHeight * 0.48, 1);
-setInterval(() => {
-  const x = window.innerWidth * (0.25 + Math.random() * 0.5);
-  const y = window.innerHeight * (0.22 + Math.random() * 0.45);
-  addRipple(x, y, 0.45 + Math.random() * 0.45);
-}, 1800);
-requestAnimationFrame(draw);
+  let stepIdx = 0;
+  let typingTimeout = null;
+
+  function clearChat() {
+    if (chatBody) chatBody.innerHTML = "";
+    if (chatInputText) chatInputText.textContent = "";
+  }
+
+  function typeInto(el, text, speed = 28) {
+    return new Promise((resolve) => {
+      let i = 0;
+      el.textContent = "";
+      function step() {
+        el.textContent += text[i++];
+        if (i < text.length) {
+          typingTimeout = setTimeout(step, speed + Math.random() * 30);
+        } else {
+          resolve();
+        }
+      }
+      step();
+    });
+  }
+
+  async function runStep() {
+    if (!chatBody || !chatInputText) return;
+    if (stepIdx >= script.length) {
+      await wait(2200);
+      clearChat();
+      stepIdx = 0;
+    }
+    const item = script[stepIdx++];
+    if (item.who === "user") {
+      await typeInto(chatInputText, item.text, 32);
+      await wait(400);
+      addMsg(item.who, item.text);
+      chatInputText.textContent = "";
+    } else {
+      const typingEl = addMsg("versa", "Versa is typing", { typing: true });
+      await wait(900 + Math.random() * 600);
+      typingEl.classList.remove("typing");
+      typingEl.textContent = "";
+      await typeInto(typingEl, item.text, 22);
+    }
+    await wait(800);
+    runStep();
+  }
+
+  function addMsg(who, text, opts = {}) {
+    const el = document.createElement("div");
+    el.className = "msg " + who + (opts.typing ? " typing" : "");
+    el.textContent = text;
+    chatBody.appendChild(el);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return el;
+  }
+  function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+  // Only start the demo when it scrolls into view, to keep things calm.
+  if (chatBody && chatInputText && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          io.disconnect();
+          runStep();
+          break;
+        }
+      }
+    }, { threshold: 0.3 });
+    io.observe(chatBody);
+  } else if (chatBody) {
+    runStep();
+  }
+
+  // ---------- Waitlist form (no backend yet) ----------
+  const form = document.getElementById("waitlistForm");
+  const note = document.getElementById("waitlistNote");
+  if (form && note) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = (form.elements.namedItem("email") || {}).value || "";
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        note.textContent = "That email looks fake. Versa noticed.";
+        note.style.color = "#ffcc33";
+        return;
+      }
+      form.reset();
+      note.textContent = "You're in. Check your inbox in a sec — and your spam, just in case.";
+      note.style.color = "#44ff9a";
+    });
+  }
+})();
