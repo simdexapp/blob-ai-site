@@ -1,0 +1,6 @@
+name = "versaai-api"
+main = "index.js"
+compatibility_date = "2026-04-15"
+
+# ANTHROPIC_API_KEY is set as a Worker secret, not a var:
+#   wrangler secret put ANTHROPIC_API_KEY
