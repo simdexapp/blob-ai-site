@@ -9,11 +9,17 @@ const transcriptKey = (id) => `versaai.chat.${id}`;
 const MAX_TURNS = 40;
 
 // Override at build time by editing this constant, or via ?api=... in dev.
-const DEFAULT_API = "/api/chat";
-const API_ENDPOINT = (() => {
+// ?api=http://localhost:8787 in dev points both /api/chat and /api/tts at the
+// local Worker; otherwise paths are same-origin.
+const apiBase = (() => {
   const fromQuery = new URLSearchParams(location.search).get("api");
-  return fromQuery || DEFAULT_API;
+  if (!fromQuery) return "";
+  // Accept either a base URL (http://localhost:8787) or a full /api/chat URL
+  // for backwards compat with the previous override format.
+  return fromQuery.replace(/\/api\/chat\/?$/, "").replace(/\/$/, "");
 })();
+const CHAT_ENDPOINT = `${apiBase}/api/chat`;
+const TTS_ENDPOINT = `${apiBase}/api/tts`;
 
 const PERSONAS = {
   versa: { name: "Versa", voice: { rate: 1.05, pitch: 1.0 } },
@@ -159,6 +165,7 @@ function selectPersona(id, opts = {}) {
   chatTitle.textContent = `${id} · live`;
 
   if (!opts.skipReload) {
+    stopVoice();
     messages = loadTranscript(id);
     renderTranscript();
   }
@@ -166,6 +173,7 @@ function selectPersona(id, opts = {}) {
 
 newChatBtn.addEventListener("click", () => {
   if (inFlight) return;
+  stopVoice();
   messages = [];
   saveTranscript();
   renderTranscript();
@@ -174,9 +182,7 @@ newChatBtn.addEventListener("click", () => {
 voiceToggle.addEventListener("change", () => {
   voiceOn = voiceToggle.checked;
   try { localStorage.setItem(VOICE_KEY, voiceOn ? "1" : "0"); } catch (_) {}
-  if (!voiceOn && "speechSynthesis" in window) {
-    speechSynthesis.cancel();
-  }
+  if (!voiceOn) stopVoice();
 });
 
 // ---------- Render ----------
@@ -244,6 +250,7 @@ chatForm.addEventListener("submit", async (e) => {
   sendBtn.disabled = true;
   chatInput.value = "";
   autosize();
+  stopVoice();
 
   messages.push({ role: "user", content: text });
   appendBubble("user", text);
@@ -252,7 +259,7 @@ chatForm.addEventListener("submit", async (e) => {
   let assistantText = "";
 
   try {
-    const resp = await fetch(API_ENDPOINT, {
+    const resp = await fetch(CHAT_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ persona: currentPersona, messages }),
@@ -330,9 +337,77 @@ function parseSSEBlock(block) {
 
 // ---------- Voice ----------
 
-function speak(text) {
+let currentAudio = null;
+let currentAudioUrl = null;
+let ttsAvailable = true; // flips to false on first server-disabled response
+
+function stopVoice() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+  }
+  if (currentAudioUrl) {
+    URL.revokeObjectURL(currentAudioUrl);
+    currentAudioUrl = null;
+  }
+  if ("speechSynthesis" in window) {
+    speechSynthesis.cancel();
+  }
+}
+
+// Strip markdown so the TTS engine doesn't pronounce asterisks and code fences.
+function cleanForSpeech(text) {
+  return text
+    .replace(/```[\s\S]*?```/g, " code block ")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/_([^_]+)_/g, "$1")
+    .replace(/~~([^~]+)~~/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function speak(text) {
+  const clean = cleanForSpeech(text);
+  if (!clean) return;
+  stopVoice();
+
+  if (ttsAvailable) {
+    try {
+      const resp = await fetch(TTS_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ persona: currentPersona, text: clean }),
+      });
+      if (resp.status === 503) {
+        ttsAvailable = false; // server has no ELEVENLABS_API_KEY; don't retry
+        speakLocal(clean);
+        return;
+      }
+      if (!resp.ok || !resp.body) throw new Error(`tts ${resp.status}`);
+      const blob = await resp.blob();
+      currentAudioUrl = URL.createObjectURL(blob);
+      currentAudio = new Audio(currentAudioUrl);
+      currentAudio.addEventListener("ended", () => {
+        if (currentAudioUrl) {
+          URL.revokeObjectURL(currentAudioUrl);
+          currentAudioUrl = null;
+        }
+      });
+      await currentAudio.play();
+      return;
+    } catch (_) {
+      // network / playback failure → fall back for this one utterance
+    }
+  }
+  speakLocal(clean);
+}
+
+function speakLocal(text) {
   if (!("speechSynthesis" in window)) return;
-  speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   const v = PERSONAS[currentPersona]?.voice || {};
   u.rate = v.rate ?? 1.0;

@@ -5,8 +5,10 @@ The unfiltered AI companion. Multi-persona chat with voice, memory, and zero fil
 This repo contains:
 
 - **Static site** — `index.html` (landing) + `chat.html` (chat UI) + `public.css` / `public.js` / `chat.css` / `chat.js`
-- **Backend** — `worker/` Cloudflare Worker that proxies chat requests to the
-  Anthropic Messages API with persona-specific system prompts and SSE streaming.
+- **Backend** — `worker/` Cloudflare Worker exposing `POST /api/chat`
+  (Anthropic Messages API, streaming SSE) and `POST /api/tts`
+  (ElevenLabs text-to-speech, streaming MP3) with persona-specific system
+  prompts and per-persona voice IDs.
 
 ## 18+ only
 
@@ -32,9 +34,10 @@ pill in `chat.html` and the gradient swatch in `public.css` if you do.
 You need two processes: the static site and the Worker.
 
 ```bash
-# 1. Worker (chat backend) — port 8787 by default
+# 1. Worker (chat + tts backend) — port 8787 by default
 cd worker
-npx wrangler secret put ANTHROPIC_API_KEY  # paste key, hit enter
+npx wrangler secret put ANTHROPIC_API_KEY      # required
+npx wrangler secret put ELEVENLABS_API_KEY     # optional, for voice replies
 npx wrangler dev
 
 # 2. Static site — port 8000
@@ -42,9 +45,10 @@ cd ..
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/`. The chat page hits `/api/chat` by default; in
-local dev, append `?api=http://localhost:8787/api/chat` to the chat URL so the
-browser talks to the Worker on its own port.
+Open `http://localhost:8000/`. The chat page hits `/api/chat` and `/api/tts`
+on the same origin by default. In local dev, append
+`?api=http://localhost:8787` to the chat URL so the browser talks to the
+Worker on its own port for both endpoints.
 
 ## Deploy
 
@@ -55,18 +59,27 @@ Cloudflare Pages, Netlify, or Vercel. No build step.
 
 ```bash
 npx wrangler secret put ANTHROPIC_API_KEY
+npx wrangler secret put ELEVENLABS_API_KEY  # optional
 npx wrangler deploy
 ```
 
 If you host both behind the same domain (Cloudflare Pages + Workers route, or
-the same Vercel project), the chat page's default `/api/chat` works as-is.
-Otherwise edit `DEFAULT_API` in `chat.js` to point at the Worker URL.
+the same Vercel project), the chat page's default `/api/*` paths work as-is.
+Otherwise change the `apiBase` resolution in `chat.js` to point at the Worker
+URL.
 
-## Model
+## Model + voice
 
 The Worker calls `claude-opus-4-7` with thinking disabled (chat is about
 personality, not multi-step reasoning) and a 1024 token cap per response.
 Adjust `MODEL` and `MAX_TOKENS` in `worker/index.js` if you want to swap.
+
+For voice, the Worker proxies to ElevenLabs `eleven_turbo_v2_5` using the
+voice ID configured per persona in `worker/personas.js`. Defaults are
+ElevenLabs shared-library voices (Rachel / Bella / Adam / Antoni); replace
+with your own cloned voices for unique-feeling characters. If the
+`ELEVENLABS_API_KEY` secret isn't set, `/api/tts` returns 503 and the client
+silently falls back to the browser's `SpeechSynthesis` API.
 
 ## Safety notes
 
